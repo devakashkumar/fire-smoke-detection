@@ -2,6 +2,8 @@
 
 Real-time fire and smoke detection using **YOLOv8** on video files, webcam streams, and Roboflow cloud inference.
 
+![Demo](demo.gif)
+
 ![Python](https://img.shields.io/badge/Python-3.10+-blue?style=flat-square&logo=python)
 ![YOLOv8](https://img.shields.io/badge/YOLOv8-Ultralytics-orange?style=flat-square)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
