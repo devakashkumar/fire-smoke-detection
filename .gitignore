@@ -1,0 +1,53 @@
+# ── Environment & Secrets ──────────────────────────────────────
+.env
+*.env.local
+*.env.*.local
+
+# ── Python ────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+.venv/
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# ── Database & Data files ─────────────────────────────────────
+*.db
+*.sqlite
+*.sqlite3
+data/videos/*
+data/outputs/*
+!data/videos/.gitkeep
+!data/outputs/.gitkeep
+
+# ── ML Models ─────────────────────────────────────────────────
+*.pt
+*.pth
+*.onnx
+*.weights
+
+# ── Logs ──────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── OS ────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── IDE ───────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── Docker volumes ────────────────────────────────────────────
+redis-data/
+*.bak
