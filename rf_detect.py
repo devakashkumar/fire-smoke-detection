@@ -1,27 +1,17 @@
+import os
 import cv2
 import numpy as np
 import base64
 import argparse
-import os
 from pathlib import Path
+from dotenv import load_dotenv
 from inference_sdk import InferenceHTTPClient
 
-# Load from environment (set RF_API_KEY in your shell or a .env file)
-try:
-    from dotenv import load_dotenv
-    load_dotenv()
-except ImportError:
-    pass  # python-dotenv not installed; rely on shell env
-
-_api_key = os.getenv("RF_API_KEY", "")
-if not _api_key:
-    raise EnvironmentError(
-        "RF_API_KEY is not set. Export it in your shell or add it to a .env file:\n"
-        "  export RF_API_KEY=your_roboflow_api_key"
-    )
+load_dotenv()
 
 CLIENT = InferenceHTTPClient(
-    api_url="https://serverless.roboflow.com", api_key=_api_key
+    api_url="https://serverless.roboflow.com",
+    api_key=os.environ["ROBOFLOW_API_KEY"],
 )
 
 CLASS_CONFIG = {
