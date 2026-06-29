@@ -1,53 +1,39 @@
-# ── Environment & Secrets ──────────────────────────────────────
-.env
-*.env.local
-*.env.*.local
-
-# ── Python ────────────────────────────────────────────────────
+# Python
+venv/
 __pycache__/
-*.py[cod]
-*$py.class
+*.pyc
 *.pyo
 *.pyd
 .Python
-venv/
-env/
-.venv/
 *.egg-info/
 dist/
 build/
-.eggs/
 
-# ── Database & Data files ─────────────────────────────────────
-*.db
-*.sqlite
-*.sqlite3
-data/videos/*
-data/outputs/*
-!data/videos/.gitkeep
-!data/outputs/.gitkeep
-
-# ── ML Models ─────────────────────────────────────────────────
+# Model weights
+models/
 *.pt
-*.pth
 *.onnx
-*.weights
+*.engine
 
-# ── Logs ──────────────────────────────────────────────────────
-*.log
+# YOLO training runs (large artifacts)
+runs/
+
+# Output & input media
+output/
+input/
+
+# Logs
 logs/
+*.log
 
-# ── OS ────────────────────────────────────────────────────────
+# Environment / secrets
+.env
+.env.local
+
+# OS
 .DS_Store
 Thumbs.db
-desktop.ini
 
-# ── IDE ───────────────────────────────────────────────────────
+# IDE
 .vscode/
 .idea/
-*.swp
-*.swo
-
-# ── Docker volumes ────────────────────────────────────────────
-redis-data/
-*.bak

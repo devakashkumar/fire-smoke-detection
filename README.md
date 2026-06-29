@@ -1,49 +1,23 @@
-# 🔥 FireWatch — Real-Time Forest Fire Detection System
+# 🔥💨 Fire & Smoke Detection — YOLOv8
 
-A production-grade wildfire detection dashboard combining **YOLOv8 computer vision** on live camera feeds with **NASA FIRMS satellite hotspot data** on an interactive map.
+Real-time fire and smoke detection using **YOLOv8** on video files, webcam streams, and Roboflow cloud inference.
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue?style=flat-square&logo=python)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green?style=flat-square&logo=fastapi)
 ![YOLOv8](https://img.shields.io/badge/YOLOv8-Ultralytics-orange?style=flat-square)
-![NASA FIRMS](https://img.shields.io/badge/NASA-FIRMS-red?style=flat-square)
+![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
 ---
 
-## ✨ Features
+## ✨ Scripts
 
-| Feature | Description |
+| Script | Description |
 |---|---|
-| 🎥 **Live Detection** | YOLOv8 fire detection on RTSP streams & uploaded videos |
-| 🛰 **Satellite Data** | NASA FIRMS MODIS/VIIRS hotspots refreshed every 15 min |
-| 🗺 **Unified Map** | Leaflet map showing satellite hotspots + camera locations |
-| 📊 **Analytics** | Detection timeline, severity charts, 7-day history, per-source breakdown |
-| ⚠️ **Alert System** | Real-time WebSocket alerts with severity levels (Watch/Warning/Emergency) |
-| 💾 **Persistence** | Alerts stored in SQLite — survive restarts |
-| 📥 **CSV Export** | Download full alert history as a timestamped CSV |
-| 🔔 **Webhooks** | Optional Slack/Teams/custom webhook for emergency notifications |
-
----
-
-## 🏗 Architecture
-
-```
-┌─────────────────────────────────────────────┐
-│                  Browser                     │
-│  Live Feeds │ Satellite Map │ Analytics      │
-└──────────────────┬──────────────────────────┘
-                   │ WebSocket + REST
-┌──────────────────▼──────────────────────────┐
-│            FastAPI Backend                   │
-│  ┌──────────┐ ┌──────────┐ ┌────────────┐  │
-│  │ Stream   │ │ YOLOv8   │ │ FIRMS      │  │
-│  │ Manager  │→│ Detector │ │ Service    │  │
-│  └──────────┘ └──────────┘ └────────────┘  │
-│  ┌──────────┐ ┌──────────────────────────┐  │
-│  │ Alert    │ │ SQLite DB                │  │
-│  │ Service  │→│ (fire_detection.db)      │  │
-│  └──────────┘ └──────────────────────────┘  │
-└─────────────────────────────────────────────┘
-```
+| `inference.py` | Full-featured inference on image or video with HUD overlay |
+| `fast_detect.py` | Optimised video inference — runs model every 3rd frame for speed |
+| `video_detect.py` | Premium visual output with corner boxes, scan lines & confidence bars |
+| `rf_detect.py` | Cloud inference via **Roboflow API** (no local GPU required) |
+| `test_pipeline.py` | Quick sanity-check pipeline on a test video |
+| `download_model.py` | Downloads YOLOv8m base weights as a placeholder for `models/best.pt` |
 
 ---
 
@@ -52,44 +26,47 @@ A production-grade wildfire detection dashboard combining **YOLOv8 computer visi
 ### 1. Clone & set up environment
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/forest-fire-detection.git
-cd forest-fire-detection
+git clone https://github.com/YOURUSERNAME/fire-smoke-detection.git
+cd fire-smoke-detection
 
 python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
-pip install -r backend/requirements.txt
+source venv/bin/activate   # Windows: venv\Scripts\activate
+pip install -r requirements.txt
 ```
 
-### 2. Configure secrets
+### 2. Get a model
 
+**Option A — Use your own trained weights:**
 ```bash
-cp .env.example .env
-# Edit .env and fill in your keys
+# Drop your trained YOLOv8 .pt file into models/
+cp path/to/your/best.pt models/best.pt
 ```
 
-Get your free NASA FIRMS key at: https://firms.modaps.eosdis.nasa.gov/api/map_key/
-
-### 3. Add a fire sample video (optional demo)
-
+**Option B — Download a base YOLOv8 model (placeholder):**
 ```bash
-# Place any fire video in data/videos/
-cp your_fire_video.mp4 data/videos/
+python download_model.py
 ```
+> Note: the base model is COCO-pretrained and won't reliably detect fire/smoke.
+> Train on the [Roboflow dataset](https://universe.roboflow.com/firesmokedataset/smoke-fire-wsde7) for best results.
 
-### 4. Run
-
-```bash
-uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-Open **http://localhost:8000**
-
----
-
-## 🐳 Docker
+### 3. Run detection
 
 ```bash
-docker-compose up --build
+# On a video file
+python inference.py --source input/fire.mp4 --model models/best.pt --save
+
+# On webcam
+python inference.py --source 0 --model models/best.pt
+
+# Fast mode (every 3rd frame)
+python fast_detect.py --source input/fire.mp4 --model models/best.pt --save
+
+# Premium visuals
+python video_detect.py --source input/fire.mp4 --model models/best.pt --save
+
+# Roboflow cloud inference (no local model needed)
+cp .env.example .env   # then set RF_API_KEY in .env
+python rf_detect.py --source input/fire.mp4
 ```
 
 ---
@@ -97,51 +74,59 @@ docker-compose up --build
 ## 📁 Project Structure
 
 ```
-forest-fire-detection/
-├── backend/
-│   ├── api/
-│   │   └── routes.py          # FastAPI endpoints & WebSocket
-│   ├── core/
-│   │   ├── detector.py        # YOLOv8 fire detection
-│   │   └── stream_manager.py  # RTSP/file stream handling
-│   ├── services/
-│   │   ├── alert_service.py   # Alert creation & SQLite persistence
-│   │   └── firms_service.py   # NASA FIRMS API integration
-│   └── main.py
-├── frontend/
-│   └── index.html             # Single-page dashboard (vanilla JS)
-├── data/
-│   ├── videos/                # Drop fire videos here for auto-loading
-│   └── outputs/               # Annotated frame outputs
-├── .env.example               # Config template (copy to .env)
-├── docker-compose.yml
-└── yolov8n.pt                 # YOLOv8 model weights
+fire-smoke-detection/
+├── inference.py          # Full-featured YOLOv8 inference (image + video)
+├── fast_detect.py        # Speed-optimised video detection
+├── video_detect.py       # Premium visual overlay detection
+├── rf_detect.py          # Roboflow cloud inference
+├── test_pipeline.py      # Quick sanity-check pipeline
+├── download_model.py     # Helper: download base YOLOv8 weights
+├── FIRE_DATASET_URL      # Dataset reference (Roboflow)
+├── requirements.txt
+├── .env.example          # Environment variable template
+├── models/               # ← drop your .pt files here (gitignored)
+├── input/                # ← drop input videos here (gitignored)
+└── output/               # Detection results saved here (gitignored)
 ```
 
 ---
 
-## ⚙️ Configuration
+## ⚙️ CLI Reference
 
-| Variable | Default | Description |
+### `inference.py` / `fast_detect.py` / `video_detect.py`
+
+| Argument | Default | Description |
 |---|---|---|
-| `FIRMS_MAP_KEY` | — | NASA FIRMS API key (required for satellite data) |
-| `FIRMS_SOURCE` | `MODIS_NRT` | Satellite source: `MODIS_NRT`, `VIIRS_SNPP_NRT`, `VIIRS_NOAA20_NRT` |
-| `FIRMS_DAYS` | `2` | Days of hotspot history (1–10) |
-| `FIRMS_BBOX` | India region | `west,south,east,north` bounding box |
-| `CONFIDENCE_THRESHOLD` | `0.45` | YOLOv8 detection confidence cutoff |
-| `FRAME_SKIP` | `3` | Process every N-th frame (performance) |
-| `MAX_CONCURRENT_STREAMS` | `10` | Max parallel video streams |
-| `ALERT_WEBHOOK_URL` | — | Slack/Teams webhook for emergency alerts |
+| `--source` | `0` | Path to video/image or `0` for webcam |
+| `--model` | `models/best.pt` | Path to YOLOv8 `.pt` model |
+| `--conf` | `0.25` | Confidence threshold |
+| `--save` | flag | Save annotated output to `output/` |
+
+### `rf_detect.py` (Roboflow cloud)
+
+| Argument | Default | Description |
+|---|---|---|
+| `--source` | required | Path to video file |
+| `--save` | flag | Save annotated output to `output/` |
+
+> Requires `RF_API_KEY` in `.env` or exported in your shell.
 
 ---
 
-## 🗺 Severity Levels
+## 🏷 Classes
 
-| Level | FRP (Fire Radiative Power) | Colour |
+| ID | Class | Colour |
 |---|---|---|
-| 🟡 Watch | < 100 MW | Yellow |
-| 🟠 Warning | 100–499 MW | Orange |
-| 🔴 Emergency | ≥ 500 MW | Red |
+| 0 | 🔥 Fire | Blue-red `(0, 80, 255)` |
+| 1 | 💨 Smoke | Grey `(180, 180, 180)` |
+
+---
+
+## 📄 Dataset & Training
+
+- **Dataset**: [Smoke & Fire — Roboflow Universe](https://universe.roboflow.com/firesmokedataset/smoke-fire-wsde7)
+- **Base model**: `yolov8n.pt` (Ultralytics)
+- **Training**: 30 epochs, 416×416, batch 8, CPU
 
 ---
 

@@ -1,0 +1,15 @@
+# Fire & Smoke Dataset
+
+This project was trained using the following Roboflow dataset:
+
+  https://universe.roboflow.com/firesmokedataset/smoke-fire-wsde7
+
+Model ID used during training: smoke-fire-wsde7/3
+
+## Training config (runs/detect/fire_smoke/args.yaml)
+  - model     : yolov8n.pt (base)
+  - epochs    : 30
+  - imgsz     : 416
+  - batch     : 8
+  - device    : cpu
+  - classes   : fire (0), smoke (1)
